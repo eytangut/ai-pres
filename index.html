@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="he"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>·</title>
+<title>路</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=block" rel="stylesheet">
 <style>
 :root{--spring:cubic-bezier(.34,1.35,.64,1)}
 html,body{margin:0;height:100%;overflow:hidden;background:#000}
@@ -77,7 +79,19 @@ const T=(f,ms)=>{tm.push(setTimeout(f,ms))},I=(f,ms)=>tm.push(setInterval(f,ms))
 const clr=()=>{tm.forEach(i=>{clearTimeout(i);clearInterval(i)});tm=[]};
 const rnd=n=>Math.floor(Math.random()*n);
 function el(t,c,p,st){const e=document.createElement(t);if(c)e.className=c;if(st)Object.assign(e.style,st);(p||S).appendChild(e);return e}
-function pic(src,cls,st,p){const i=el('img',cls,p,st);i.onerror=()=>{i.removeAttribute('src');i.classList.add('ph')};i.src=src;return i}
+/* handwritten digits, drawn on a canvas in a messy handwriting font (white ink, transparent): no image files needed */
+const HF='"Reenie Beanie","Segoe Print","Bradley Hand",cursive';
+try{document.fonts.load('200px "Reenie Beanie"',"0123456789")}catch(e){}
+const dcache={};
+function digitURL(d,v){const ok=document.fonts&&document.fonts.check('200px "Reenie Beanie"'),k=d+'_'+v;if(ok&&dcache[k])return dcache[k];
+ const r=n=>{const h=Math.sin((d+1)*91.7+(v+1)*13.3+n*7.1)*43758.5453;return h-Math.floor(h)-.5};
+ const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+ x.translate(128+r(1)*16,134+r(2)*14);x.rotate(r(3)*.28);x.scale(1+r(4)*.16,1+r(5)*.2);
+ x.font='230px '+HF;x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';x.strokeStyle='#fff';x.lineWidth=7;x.lineJoin='round';
+ x.fillText(String(d),0,0);x.strokeText(String(d),0,0);const u=c.toDataURL();if(ok)dcache[k]=u;return u}
+function pic(src,cls,st,p){const i=el('img',cls,p,st);const dm=/assets\/digits\/(\d)\.png(?:\?v=(\d+))?/.exec(src);
+ if(dm){i.src=digitURL(+dm[1],+(dm[2]||0));if(!(document.fonts&&document.fonts.check('200px "Reenie Beanie"')))document.fonts&&document.fonts.ready.then(()=>{i.src=digitURL(+dm[1],+(dm[2]||0))});return i}
+i.onerror=()=>{i.removeAttribute('src');i.classList.add('ph')};i.src=src;return i}
 const pic1=(src,x='50%')=>pic(src,'a big',{left:x,top:'50%'});
 const GREEN='#1fbf5f',RED='#e02424';
 /* one spring for everything (slight overshoot); falls back to a cubic-bezier overshoot if linear() is unsupported */
@@ -125,7 +139,7 @@ function morph(M,w,mode){const xWin=M[M.length-1][1]=='x';
    m.style.left=l;m.style.top=t;
    m.animate([{...from,filter:'blur(0px)'},{offset:.4,filter:'blur(2.4px)'},{left:l,top:t,filter:'blur(0px)'}],{duration:1500,easing:'cubic-bezier(.45,0,.2,1)',fill:'backwards'})},1100+j*170))
  }else xs.forEach((m,j)=>{const[l,t]=colPos(j,n);m.classList.add('ball');m.style.left=l;m.style.top=t;
-  if(mode==1){el('div','fire',m).textContent='🔥';T(()=>{m.style.background='#1a1a1a';m.style.boxShadow='none'},1400)}});
+  if(mode==1){el('div','fire',m).textContent='馃敟';T(()=>{m.style.background='#1a1a1a';m.style.boxShadow='none'},1400)}});
  return{r,xs,n}}
 /* three more balls drop onto each ball and heap up into a small pile */
 function piles(){const{r,xs,n}=morph(GOOD,GW,2),dx=[1.2,-1.4,.8];
@@ -142,7 +156,7 @@ const XX='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" stroke="#e0242
 function setRob(r,p,ms){r.style.transition=ms?`left ${ms}ms var(--spring)`:'none';r.style.left=`calc(12cqw + ${p*.76}cqw)`}
 const RGLOW='drop-shadow(0 0 2cqmin rgba(255,255,255,.35))';
 function trk(){el('div','tl');el('div','a ic',null,{left:'91cqw',top:'50%',filter:`drop-shadow(0 0 2cqmin ${GREEN})`}).innerHTML=CK;el('div','a ic',null,{left:'9cqw',top:'50%',filter:`drop-shadow(0 0 2cqmin ${RED})`}).innerHTML=XX;
- const r=el('div','a rb',null,{top:'50%',filter:RGLOW});const i=el('img','',r);i.onerror=()=>{i.remove();r.textContent='🤖'};i.src='assets/robot.png';setRob(r,50,0);return r}
+ const r=el('div','a rb',null,{top:'50%',filter:RGLOW});const i=el('img','',r);i.onerror=()=>{i.remove();r.textContent='馃'};i.src='assets/robot.png';setRob(r,50,0);return r}
 function lone(i,c){const g=el('div','g');board(g);mark(g,i,'x',1);T(()=>flash(c,.5,1100),500)}
 
 /* ---------- network (all coordinates in the 1920x1080 stage space) ---------- */
@@ -152,8 +166,10 @@ const ctr=e=>{const q=rc(e);return[(q.l+q.r)/2,(q.t+q.b)/2]};
 const BLOOM_LINES=true;
 function svg(){const v=document.createElementNS(NS,'svg');v.setAttribute('class','ov');v.innerHTML='<defs><marker id="ah" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5z" class="mp"/></marker><filter id="bl" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
  const g=document.createElementNS(NS,'g');if(BLOOM_LINES&&!S.classList.contains('L'))g.setAttribute('filter','url(#bl)');v.appendChild(g);v.lg=g;S.appendChild(v);return v}
+/* Grid-sized 7: its top-left, top-right, and bottom-left corners align with the grid. */
+const GRID_SEVEN='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 6 8 L 94 8 L 17 92" fill="none" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>');
 function mkGrid(x,s,n=5){const w=el('div','a gw',null,{left:x,top:'50%',width:s+'cqmin',height:s+'cqmin'});
- const im=pic('assets/digits/7.png','im',null,w);const g=el('div','gr',w);g.style.gridTemplate=`repeat(${n},1fr)/repeat(${n},1fr)`;
+ const im=el('img','im',w);im.alt='7';im.src=GRID_SEVEN;const g=el('div','gr',w);g.style.gridTemplate=`repeat(${n},1fr)/repeat(${n},1fr)`;
  return{w,im,cells:[...Array(n*n)].map(()=>el('div','',g))}}
 function mkCirc(x,n,pitch,sz,txt){return[...Array(n)].map((_,i)=>{const c=el('div','a cr',null,{left:x,top:`calc(50cqh + ${(i-(n-1)/2)*pitch}cqmin)`,width:sz+'cqmin',height:sz+'cqmin',fontSize:sz*.58+'cqmin'});if(txt)c.textContent=i;return c})}
 function ln(v,a,b,cls){const l=document.createElementNS(NS,'line');l.setAttribute('x1',a[0]);l.setAttribute('y1',a[1]);l.setAttribute('x2',b[0]);l.setAttribute('y2',b[1]);l.setAttribute('class',cls);(v.lg||v).appendChild(l);return l}
@@ -165,7 +181,7 @@ function net(o){const big=o.big,G=mkGrid(big?'26cqw':'17cqw',big?56:30),v=svg();
  const H=o.hid?mkCirc('50cqw',6,12,8,0):null;let W=null,W2=null;
  if(o.cls){if(H){W=wire(v,G.cells,H,o.cls);W2=wire(v,H,D,o.cls)}else W=wire(v,G.cells,D,o.cls)}
  return{G,D,H,W,W2,v}}
-const CORN=[0,4,24,20];
+const CORN=[0,4,20,24];
 function killPulses(n,fade){const g=n.pg;n.pg=null;if(!g)return;if(fade){g.style.transition='opacity .6s';g.style.opacity=0;T(()=>g.remove(),700)}else g.remove()}
 /* small lights travelling cell -> digit along the highlighted lines */
 function pulses(n,L){killPulses(n,0);const g=document.createElementNS(NS,'g'),d=1.8;n.pg=g;n.v.appendChild(g);
@@ -177,13 +193,13 @@ function pulses(n,L){killPulses(n,0);const g=document.createElementNS(NS,'g'),d=
 function apply(n,lv){n.D[7].classList.toggle('lit',lv>=2&&lv<5);
  n.W.forEach((row,i)=>row.forEach((l,j)=>{let c='ln';
   if(lv==0)c+=' z';else if(lv>=2){const k=CORN.includes(i)&&j==7&&lv<5;
-   c+=k?(lv==2?' hi':i==20?(lv==4?' r':' hi'):' g'):' dim'}
+   c+=k?(lv==2?' hi':i==24?(lv==4?' r':' hi'):' g'):' dim'}
   l.setAttribute('class',c);
-  if(CORN.includes(i)&&j==7&&lv>=2)l.style.setProperty('--w',i==20?.95:1)}));
- if(!n.nop&&lv>=2&&lv<5)pulses(n,CORN.map(i=>[n.W[i][7],lv==2?'#fff':i==20?(lv==4?RED:'#fff'):GREEN]));else killPulses(n,0)}
+  if(CORN.includes(i)&&j==7&&lv>=2)l.style.setProperty('--w',i==24?.95:1)}));
+ if(!n.nop&&lv>=2&&lv<5)pulses(n,CORN.map(i=>[n.W[i][7],lv==2?'#fff':i==24?(lv==4?RED:'#fff'):GREEN]));else killPulses(n,0)}
 function seq(a,b,np){const n=net({big:1,cls:'ln'});n.nop=np;apply(n,a);if(a!=b)T(()=>apply(n,b),600);return n}
 function shift(n,anim){const im=n.G.im,mv=()=>{im.style.translate='3.5cqmin -2.2cqmin';im.style.rotate='11deg'};
- const dk=()=>{[0,4,24].forEach(i=>n.G.cells[i].classList.add('dk'));killPulses(n,1)};
+ const dk=()=>{[0,4,20].forEach(i=>n.G.cells[i].classList.add('dk'));killPulses(n,1)};
  if(anim){im.style.transition='translate 1.3s ease-in-out,rotate 1.3s ease-in-out';T(mv,700);T(dk,1500)}else{mv();dk()}}
 
 /* ---------- middle-layer shapes -> blobs ---------- */
@@ -241,7 +257,7 @@ add('D',()=>{},1);
 /* cloud: your 10 digits reused 2x with different size / rotation / position */
 add('D',()=>{let s=7;const R=()=>(s=s*16807%2147483647)/2147483647;
  for(let j=0;j<20;j++){const c=j%5,r=Math.floor(j/5),z=15+R()*14;
-  pic(`assets/digits/${(j*3)%10}.png`,'a dg',null).style.cssText+=`;width:${z}cqmin;height:${z}cqmin;left:${10+c*20+(R()-.5)*8}cqw;top:${14+r*24+(R()-.5)*8}cqh;rotate:${(R()-.5)*90}deg;animation-delay:${j*60}ms`}});
+  pic(`assets/digits/${(j*3)%10}.png?v=${j}`,'a dg',null).style.cssText+=`;width:${z}cqmin;height:${z}cqmin;left:${10+c*20+(R()-.5)*8}cqw;top:${14+r*24+(R()-.5)*8}cqh;rotate:${(R()-.5)*90}deg;animation-delay:${j*60}ms`}});
 add('D',()=>mkGrid('50cqw',66));
 add('D',()=>{mkGrid('26cqw',56);mkCirc('84cqw',10,8.6,6.8,1)});
 add('D',()=>seq(0,1));
@@ -276,43 +292,43 @@ add('D',()=>{},1);
 
 /* ---------- presenter notes (Hebrew, press S for speaker view) ---------- */
 const NT={
-0:[`בכיתה א', מאוד התרגשתי כשקנו את הציוד. אחד הדברים שקניתי הוא מחברת ציורים. לא ידעתי לצייר, אז עשיתי שטויות. בין השאר איקס עיגול. היום ננקום את נקמת דם איתן-מכיתה-א על כל היריבים שהוא הפסיד להם באיקס-עיגול.`],
-1:[`להראות את המערכת: הקופסאות השונות והחרוזים, ואיך יעשו בה משחק.`],
-4:[`לעשות דוגמא של משחק "רע". מכונה בוחרת אקראית לגמרי, ככה שבני אדם יכולים פשוט לנצח ב - 3 מהלכים. **(לשתף קהל? מרגיש שכדאי, אבל אולי מסובך טכנית)**`],
-9:[`המכונה הפסידה.`],
-10:[`אז המהלכים האלו הם מהלכים לא טובים, ולא כדאי לעשות אותם.`],
-11:[`אז נוציא אותם.`],
-12:[`עכשיו משחק טוב: המכונה מצליחה לנצח. **(לחשוב על דרך שבה לנצח באיקס-עיגול יראה אמין. אפשר לקשר לסיפור של כיתה א' כדי לפצות על הטיפשות)**`],
-18:[`המכונה ניצחה.`],
-19:[`זה דבר שאנחנו רוצים שיקרה,`],
-20:[`אז נוסיף עוד מהמהלכים שגרמו לזה.`],
-21:[`לאט לאט, על ידי מקל וגזר, המכונה פשוט לומדת אסטרטגיות, לגמרי לבד.`],
-25:[`לדוגמא, תמיד להתחיל באמצע.`],
-28:[`עוד בעיה שהייתה לאיתן בכיתה א', זה שכתב היד שלו היה מאוד גרוע.`],
-29:[`אז נמשיך במסע של לעזור לאיתן-מכיתה-א' עם כל מי שצחק על הכתב שלו, ונבנה מכונה שדווקא כן יכולה לזהות את הספרות שהוא כותב.`],
-30:[`אנחנו עכשיו מדברים במכונות, אז כדאי לעשות את זה קצת יותר ברור.`],
-31:[`יש לנו רשימה של פיקסלים, ורשימה של ספרות, וקופסה שחורה באמצע. אנחנו רוצים שאיכשהו, מהמידע של הפיקסלים נגיע לאחת הספרות.`],
-32:[`טוב, אנחנו יודעים איך עושים את זה: מחברים הכל, מקבלים שטויות, ולאט לאט מלמדים. אם בדוגמא מסויימת יש פיקסל, אנחנו רוצים לומר שהוא *קשור חיובית* למספר הזה. אם לא, *קשור שלילית*. נחזק את מה שאנחנו רוצים, ונחליש את מה שלא.`],
-33:[`לדוגמא, נסתכל על המספר 7.`],
-34:[`אנחנו רוצים שהמכונה תלמד שדברים באיזור הכללי של שלוש מהפינות קשורים ל7, הם מרמזים ש - 7 קורה,`],
-35:[`ושדברים בפינה האחרת אומרים להפך.`,`זה באמת יכול לפעול במידה מסויימת. אבל לא מאוד טוב. הבעייה היא, שלומדים תמונה, ולא סימנים.`],
-36:[`אם המספר טיפה זז, או טיפה על הצד, הכל נהרס.`],
-37:[`אנחנו רוצים ללמוד את הסימן עצמו, לא את איך שאנחנו ציירנו אותו.`],
-38:[`איך נעשה את זה? כמו כל דבר שאנחנו יודעים, נלמד מהגננת בגן חובה. יש את החוברות האלה, שלומדים לצייר ספרות, שלב אחרי שלב.`,`אז אולי, כמו שאנחנו למדנו ש - 2 זה קשת ואז נכנס פנימה ואז קו, שגם בינה מלאכותית תלמד ככה.`],
-39:[`אז אנחנו רוצים 2 שלבים, מפרקים את המשימה הקשה לשתי משימות קלות: קודם, לזהות מבנים: קו, עיגול, קשת. אחרי זה, מכונה שמהמבנים האלה יודעת איזה מספר זה, לא מהציור עצמו.`],
-40:[`אז אנחנו רוצים להוסיף עוד שלב באמצע: עצירה לחשוב. עוד שכבה.`],
-41:[`עכשיו, אנחנו לא יודעים שזה באמת מה שקורה. אנחנו בעצם הכנסנו למכונה עוד שכבה, לזהות מבנים, ולהרכיב משהו מהמבנים האלו. זה לא בהכרח אותם מבנים כמו שאינטואיטיביים לנו: זה מה שהמכונה תלמד.`],
-41:[`אנחנו לא מתכנתים את זה: אנחנו מכניסים את השכבה באמצע, נותנים לבינה המלאכותית לעשות את השלב הזה, את הזיהוי תבניות, אבל מה שבדיוק קורה זה לפי זיהוי התבניות, עם מקל וגזר מהדוגמאות שלנו, כמו שראינו עד עכשיו.`],
-42:[`בעיה אחרונה שהייתה לאיתן-מכיתה-א' (צריך להיזהר לא לעשות יותר מדי גמילות חסדים ביום אחד), זה שהוא דיבר שטויות (יש שאומרים שזה ככה עד היום). ננסה ליצור מכונה שתתקן את זה, ושתדבר בצורה קוהרנטית.`,
- `איך מתחילים בכלל? איך מבינים שפה?`,
- `נעשה כמו מקודם: נחלק לשכבות. נעשה כל פעם בעיה קטנה של הבנת מבנים, ונתקדם.`,
- `מקודם, עשינו 3 שכבות, ויכולנו לעקוב אחרי זה ולתת משמעות, עכשיו, זו בעיה יותר מסובכת, אז לא באמת נוכל לדעת. פשוט מחלקים ונותנים לזה ללמוד תבניות לעקוב אחריהן. אם כל שכבה היא בניין, זה יהיה מגדל אייפל.`,
- `אבל זה אותו עניין של למידה. פשוט יותר שכבות שהן גם יותר מסובכות.`],
-43:[`בשביל לנחש את המילה הבאה, אי אפשר סתם לאמן על משפטים. שפה לא עובדת ככה.`,
- `צריך גם הקשר, וגם ידע חיצוני. גם להוסיף משהו למילה, וגם שהמילים ישפיעו אחת על השנייה.`,
- `שפה לא עובדת ככה. בעצם, יש לנו מרחב, שכל כיוון הוא מילה, ואז אפשר לחבר מילים וללכת בכיוון של מילים מסוימות, ויש לזה משמעות, אבל לא חייבים להבין את זה.`],
-44:[`בשביל ללמד מכונה, צריך פשוט לתת לה הרבה אופציות (כל החרוזים בקופסאות), ולהוריד את האופציות הרעות ולחזק את הטובות.`,
- `כשיש בעיה קשה מדי, פשוט מפצלים אותה לבעיות קלות יותר.`,
+0:[`讘讻讬转讛 讗', 诪讗讜讚 讛转专讙砖转讬 讻砖拽谞讜 讗转 讛爪讬讜讚. 讗讞讚 讛讚讘专讬诐 砖拽谞讬转讬 讛讜讗 诪讞讘专转 爪讬讜专讬诐. 诇讗 讬讚注转讬 诇爪讬讬专, 讗讝 注砖讬转讬 砖讟讜讬讜转. 讘讬谉 讛砖讗专 讗讬拽住 注讬讙讜诇. 讛讬讜诐 谞谞拽讜诐 讗转 谞拽诪转 讚诐 讗讬转谉-诪讻讬转讛-讗 注诇 讻诇 讛讬专讬讘讬诐 砖讛讜讗 讛驻住讬讚 诇讛诐 讘讗讬拽住-注讬讙讜诇.`],
+1:[`诇讛专讗讜转 讗转 讛诪注专讻转: 讛拽讜驻住讗讜转 讛砖讜谞讜转 讜讛讞专讜讝讬诐, 讜讗讬讱 讬注砖讜 讘讛 诪砖讞拽.`],
+4:[`诇注砖讜转 讚讜讙诪讗 砖诇 诪砖讞拽 "专注". 诪讻讜谞讛 讘讜讞专转 讗拽专讗讬转 诇讙诪专讬, 讻讻讛 砖讘谞讬 讗讚诐 讬讻讜诇讬诐 驻砖讜讟 诇谞爪讞 讘 - 3 诪讛诇讻讬诐. **(诇砖转祝 拽讛诇? 诪专讙讬砖 砖讻讚讗讬, 讗讘诇 讗讜诇讬 诪住讜讘讱 讟讻谞讬转)**`],
+9:[`讛诪讻讜谞讛 讛驻住讬讚讛.`],
+10:[`讗讝 讛诪讛诇讻讬诐 讛讗诇讜 讛诐 诪讛诇讻讬诐 诇讗 讟讜讘讬诐, 讜诇讗 讻讚讗讬 诇注砖讜转 讗讜转诐.`],
+11:[`讗讝 谞讜爪讬讗 讗讜转诐.`],
+12:[`注讻砖讬讜 诪砖讞拽 讟讜讘: 讛诪讻讜谞讛 诪爪诇讬讞讛 诇谞爪讞. **(诇讞砖讜讘 注诇 讚专讱 砖讘讛 诇谞爪讞 讘讗讬拽住-注讬讙讜诇 讬专讗讛 讗诪讬谉. 讗驻砖专 诇拽砖专 诇住讬驻讜专 砖诇 讻讬转讛 讗' 讻讚讬 诇驻爪讜转 注诇 讛讟讬驻砖讜转)**`],
+18:[`讛诪讻讜谞讛 谞讬爪讞讛.`],
+19:[`讝讛 讚讘专 砖讗谞讞谞讜 专讜爪讬诐 砖讬拽专讛,`],
+20:[`讗讝 谞讜住讬祝 注讜讚 诪讛诪讛诇讻讬诐 砖讙专诪讜 诇讝讛.`],
+21:[`诇讗讟 诇讗讟, 注诇 讬讚讬 诪拽诇 讜讙讝专, 讛诪讻讜谞讛 驻砖讜讟 诇讜诪讚转 讗住讟专讟讙讬讜转, 诇讙诪专讬 诇讘讚.`],
+25:[`诇讚讜讙诪讗, 转诪讬讚 诇讛转讞讬诇 讘讗诪爪注.`],
+28:[`注讜讚 讘注讬讛 砖讛讬讬转讛 诇讗讬转谉 讘讻讬转讛 讗', 讝讛 砖讻转讘 讛讬讚 砖诇讜 讛讬讛 诪讗讜讚 讙专讜注.`],
+29:[`讗讝 谞诪砖讬讱 讘诪住注 砖诇 诇注讝讜专 诇讗讬转谉-诪讻讬转讛-讗' 注诐 讻诇 诪讬 砖爪讞拽 注诇 讛讻转讘 砖诇讜, 讜谞讘谞讛 诪讻讜谞讛 砖讚讜讜拽讗 讻谉 讬讻讜诇讛 诇讝讛讜转 讗转 讛住驻专讜转 砖讛讜讗 讻讜转讘.`],
+30:[`讗谞讞谞讜 注讻砖讬讜 诪讚讘专讬诐 讘诪讻讜谞讜转, 讗讝 讻讚讗讬 诇注砖讜转 讗转 讝讛 拽爪转 讬讜转专 讘专讜专.`],
+31:[`讬砖 诇谞讜 专砖讬诪讛 砖诇 驻讬拽住诇讬诐, 讜专砖讬诪讛 砖诇 住驻专讜转, 讜拽讜驻住讛 砖讞讜专讛 讘讗诪爪注. 讗谞讞谞讜 专讜爪讬诐 砖讗讬讻砖讛讜, 诪讛诪讬讚注 砖诇 讛驻讬拽住诇讬诐 谞讙讬注 诇讗讞转 讛住驻专讜转.`],
+32:[`讟讜讘, 讗谞讞谞讜 讬讜讚注讬诐 讗讬讱 注讜砖讬诐 讗转 讝讛: 诪讞讘专讬诐 讛讻诇, 诪拽讘诇讬诐 砖讟讜讬讜转, 讜诇讗讟 诇讗讟 诪诇诪讚讬诐. 讗诐 讘讚讜讙诪讗 诪住讜讬讬诪转 讬砖 驻讬拽住诇, 讗谞讞谞讜 专讜爪讬诐 诇讜诪专 砖讛讜讗 *拽砖讜专 讞讬讜讘讬转* 诇诪住驻专 讛讝讛. 讗诐 诇讗, *拽砖讜专 砖诇讬诇讬转*. 谞讞讝拽 讗转 诪讛 砖讗谞讞谞讜 专讜爪讬诐, 讜谞讞诇讬砖 讗转 诪讛 砖诇讗.`],
+33:[`诇讚讜讙诪讗, 谞住转讻诇 注诇 讛诪住驻专 7.`],
+34:[`讗谞讞谞讜 专讜爪讬诐 砖讛诪讻讜谞讛 转诇诪讚 砖讚讘专讬诐 讘讗讬讝讜专 讛讻诇诇讬 砖诇 砖诇讜砖 诪讛驻讬谞讜转 拽砖讜专讬诐 诇7, 讛诐 诪专诪讝讬诐 砖 - 7 拽讜专讛,`],
+35:[`讜砖讚讘专讬诐 讘驻讬谞讛 讛讗讞专转 讗讜诪专讬诐 诇讛驻讱.`,`讝讛 讘讗诪转 讬讻讜诇 诇驻注讜诇 讘诪讬讚讛 诪住讜讬讬诪转. 讗讘诇 诇讗 诪讗讜讚 讟讜讘. 讛讘注讬讬讛 讛讬讗, 砖诇讜诪讚讬诐 转诪讜谞讛, 讜诇讗 住讬诪谞讬诐.`],
+36:[`讗诐 讛诪住驻专 讟讬驻讛 讝讝, 讗讜 讟讬驻讛 注诇 讛爪讚, 讛讻诇 谞讛专住.`],
+37:[`讗谞讞谞讜 专讜爪讬诐 诇诇诪讜讚 讗转 讛住讬诪谉 注爪诪讜, 诇讗 讗转 讗讬讱 砖讗谞讞谞讜 爪讬讬专谞讜 讗讜转讜.`],
+38:[`讗讬讱 谞注砖讛 讗转 讝讛? 讻诪讜 讻诇 讚讘专 砖讗谞讞谞讜 讬讜讚注讬诐, 谞诇诪讚 诪讛讙谞谞转 讘讙谉 讞讜讘讛. 讬砖 讗转 讛讞讜讘专讜转 讛讗诇讛, 砖诇讜诪讚讬诐 诇爪讬讬专 住驻专讜转, 砖诇讘 讗讞专讬 砖诇讘.`,`讗讝 讗讜诇讬, 讻诪讜 砖讗谞讞谞讜 诇诪讚谞讜 砖 - 2 讝讛 拽砖转 讜讗讝 谞讻谞住 驻谞讬诪讛 讜讗讝 拽讜, 砖讙诐 讘讬谞讛 诪诇讗讻讜转讬转 转诇诪讚 讻讻讛.`],
+39:[`讗讝 讗谞讞谞讜 专讜爪讬诐 2 砖诇讘讬诐, 诪驻专拽讬诐 讗转 讛诪砖讬诪讛 讛拽砖讛 诇砖转讬 诪砖讬诪讜转 拽诇讜转: 拽讜讚诐, 诇讝讛讜转 诪讘谞讬诐: 拽讜, 注讬讙讜诇, 拽砖转. 讗讞专讬 讝讛, 诪讻讜谞讛 砖诪讛诪讘谞讬诐 讛讗诇讛 讬讜讚注转 讗讬讝讛 诪住驻专 讝讛, 诇讗 诪讛爪讬讜专 注爪诪讜.`],
+40:[`讗讝 讗谞讞谞讜 专讜爪讬诐 诇讛讜住讬祝 注讜讚 砖诇讘 讘讗诪爪注: 注爪讬专讛 诇讞砖讜讘. 注讜讚 砖讻讘讛.`],
+41:[`注讻砖讬讜, 讗谞讞谞讜 诇讗 讬讜讚注讬诐 砖讝讛 讘讗诪转 诪讛 砖拽讜专讛. 讗谞讞谞讜 讘注爪诐 讛讻谞住谞讜 诇诪讻讜谞讛 注讜讚 砖讻讘讛, 诇讝讛讜转 诪讘谞讬诐, 讜诇讛专讻讬讘 诪砖讛讜 诪讛诪讘谞讬诐 讛讗诇讜. 讝讛 诇讗 讘讛讻专讞 讗讜转诐 诪讘谞讬诐 讻诪讜 砖讗讬谞讟讜讗讬讟讬讘讬讬诐 诇谞讜: 讝讛 诪讛 砖讛诪讻讜谞讛 转诇诪讚.`],
+41:[`讗谞讞谞讜 诇讗 诪转讻谞转讬诐 讗转 讝讛: 讗谞讞谞讜 诪讻谞讬住讬诐 讗转 讛砖讻讘讛 讘讗诪爪注, 谞讜转谞讬诐 诇讘讬谞讛 讛诪诇讗讻讜转讬转 诇注砖讜转 讗转 讛砖诇讘 讛讝讛, 讗转 讛讝讬讛讜讬 转讘谞讬讜转, 讗讘诇 诪讛 砖讘讚讬讜拽 拽讜专讛 讝讛 诇驻讬 讝讬讛讜讬 讛转讘谞讬讜转, 注诐 诪拽诇 讜讙讝专 诪讛讚讜讙诪讗讜转 砖诇谞讜, 讻诪讜 砖专讗讬谞讜 注讚 注讻砖讬讜.`],
+42:[`讘注讬讛 讗讞专讜谞讛 砖讛讬讬转讛 诇讗讬转谉-诪讻讬转讛-讗' (爪专讬讱 诇讛讬讝讛专 诇讗 诇注砖讜转 讬讜转专 诪讚讬 讙诪讬诇讜转 讞住讚讬诐 讘讬讜诐 讗讞讚), 讝讛 砖讛讜讗 讚讬讘专 砖讟讜讬讜转 (讬砖 砖讗讜诪专讬诐 砖讝讛 讻讻讛 注讚 讛讬讜诐). 谞谞住讛 诇讬爪讜专 诪讻讜谞讛 砖转转拽谉 讗转 讝讛, 讜砖转讚讘专 讘爪讜专讛 拽讜讛专谞讟讬转.`,
+ `讗讬讱 诪转讞讬诇讬诐 讘讻诇诇? 讗讬讱 诪讘讬谞讬诐 砖驻讛?`,
+ `谞注砖讛 讻诪讜 诪拽讜讚诐: 谞讞诇拽 诇砖讻讘讜转. 谞注砖讛 讻诇 驻注诐 讘注讬讛 拽讟谞讛 砖诇 讛讘谞转 诪讘谞讬诐, 讜谞转拽讚诐.`,
+ `诪拽讜讚诐, 注砖讬谞讜 3 砖讻讘讜转, 讜讬讻讜诇谞讜 诇注拽讜讘 讗讞专讬 讝讛 讜诇转转 诪砖诪注讜转, 注讻砖讬讜, 讝讜 讘注讬讛 讬讜转专 诪住讜讘讻转, 讗讝 诇讗 讘讗诪转 谞讜讻诇 诇讚注转. 驻砖讜讟 诪讞诇拽讬诐 讜谞讜转谞讬诐 诇讝讛 诇诇诪讜讚 转讘谞讬讜转 诇注拽讜讘 讗讞专讬讛谉. 讗诐 讻诇 砖讻讘讛 讛讬讗 讘谞讬讬谉, 讝讛 讬讛讬讛 诪讙讚诇 讗讬讬驻诇.`,
+ `讗讘诇 讝讛 讗讜转讜 注谞讬讬谉 砖诇 诇诪讬讚讛. 驻砖讜讟 讬讜转专 砖讻讘讜转 砖讛谉 讙诐 讬讜转专 诪住讜讘讻讜转.`],
+43:[`讘砖讘讬诇 诇谞讞砖 讗转 讛诪讬诇讛 讛讘讗讛, 讗讬 讗驻砖专 住转诐 诇讗诪谉 注诇 诪砖驻讟讬诐. 砖驻讛 诇讗 注讜讘讚转 讻讻讛.`,
+ `爪专讬讱 讙诐 讛拽砖专, 讜讙诐 讬讚注 讞讬爪讜谞讬. 讙诐 诇讛讜住讬祝 诪砖讛讜 诇诪讬诇讛, 讜讙诐 砖讛诪讬诇讬诐 讬砖驻讬注讜 讗讞转 注诇 讛砖谞讬讬讛.`,
+ `砖驻讛 诇讗 注讜讘讚转 讻讻讛. 讘注爪诐, 讬砖 诇谞讜 诪专讞讘, 砖讻诇 讻讬讜讜谉 讛讜讗 诪讬诇讛, 讜讗讝 讗驻砖专 诇讞讘专 诪讬诇讬诐 讜诇诇讻转 讘讻讬讜讜谉 砖诇 诪讬诇讬诐 诪住讜讬诪讜转, 讜讬砖 诇讝讛 诪砖诪注讜转, 讗讘诇 诇讗 讞讬讬讘讬诐 诇讛讘讬谉 讗转 讝讛.`],
+44:[`讘砖讘讬诇 诇诇诪讚 诪讻讜谞讛, 爪专讬讱 驻砖讜讟 诇转转 诇讛 讛专讘讛 讗讜驻爪讬讜转 (讻诇 讛讞专讜讝讬诐 讘拽讜驻住讗讜转), 讜诇讛讜专讬讚 讗转 讛讗讜驻爪讬讜转 讛专注讜转 讜诇讞讝拽 讗转 讛讟讜讘讜转.`,
+ `讻砖讬砖 讘注讬讛 拽砖讛 诪讚讬, 驻砖讜讟 诪驻爪诇讬诐 讗讜转讛 诇讘注讬讜转 拽诇讜转 讬讜转专.`,
  `**Think of a good ending**.`]
 };
 const fmt=s=>s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
